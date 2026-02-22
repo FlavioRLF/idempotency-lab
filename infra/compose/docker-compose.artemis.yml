@@ -1,0 +1,211 @@
+services:
+  artemis:
+    image: apache/activemq-artemis:2.37.0
+    container_name: lab-artemis
+    environment:
+      ARTEMIS_USER: artemis
+      ARTEMIS_PASSWORD: artemis
+      ANONYMOUS_LOGIN: "true"
+    ports:
+      - "61616:61616"   # core/JMS
+      - "8161:8161"     # web console
+    healthcheck:
+      test: ["CMD-SHELL", "bash -lc 'echo > /dev/tcp/127.0.0.1/61616'"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  producer-api:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.module
+      args:
+        MODULE_DIR: apps/producer-api
+    container_name: lab-producer
+    depends_on:
+      artemis:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: artemis
+      SPRING_ARTEMIS_BROKER_URL: tcp://artemis:61616
+      SPRING_ARTEMIS_USER: artemis
+      SPRING_ARTEMIS_PASSWORD: artemis
+      LAB_ARTEMIS_DESTINATION: lab.events
+    ports:
+      - "8080:8080"
+
+  # -------- Consumers (NAIVE) --------
+  consumer-naive-1:
+    profiles: ["naive"]
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.module
+      args:
+        MODULE_DIR: apps/consumer-naive
+    depends_on:
+      postgres:
+        condition: service_healthy
+      artemis:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: artemis
+      SPRING_ARTEMIS_BROKER_URL: tcp://artemis:61616
+      SPRING_ARTEMIS_USER: artemis
+      SPRING_ARTEMIS_PASSWORD: artemis
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/lab
+      SPRING_DATASOURCE_USERNAME: lab
+      SPRING_DATASOURCE_PASSWORD: lab
+      LAB_ARTEMIS_DESTINATION: lab.events
+
+      LAB_FAIL_MODE: NONE
+      LAB_FAIL_RATE: "0.0"
+      LAB_FAIL_SLEEP_MS: "0"
+      LAB_FAIL_ON_MESSAGE_IDS: ""
+    ports:
+      - "8081:8081"
+
+  consumer-naive-2:
+    profiles: ["naive"]
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.module
+      args:
+        MODULE_DIR: apps/consumer-naive
+    depends_on:
+      postgres:
+        condition: service_healthy
+      artemis:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: artemis
+      SPRING_ARTEMIS_BROKER_URL: tcp://artemis:61616
+      SPRING_ARTEMIS_USER: artemis
+      SPRING_ARTEMIS_PASSWORD: artemis
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/lab
+      SPRING_DATASOURCE_USERNAME: lab
+      SPRING_DATASOURCE_PASSWORD: lab
+      LAB_ARTEMIS_DESTINATION: lab.events
+
+      LAB_FAIL_MODE: NONE
+      LAB_FAIL_RATE: "0.0"
+      LAB_FAIL_SLEEP_MS: "0"
+      LAB_FAIL_ON_MESSAGE_IDS: ""
+    ports:
+      - "8083:8081"
+
+  consumer-naive-3:
+    profiles: ["naive"]
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.module
+      args:
+        MODULE_DIR: apps/consumer-naive
+    depends_on:
+      postgres:
+        condition: service_healthy
+      artemis:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: artemis
+      SPRING_ARTEMIS_BROKER_URL: tcp://artemis:61616
+      SPRING_ARTEMIS_USER: artemis
+      SPRING_ARTEMIS_PASSWORD: artemis
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/lab
+      SPRING_DATASOURCE_USERNAME: lab
+      SPRING_DATASOURCE_PASSWORD: lab
+      LAB_ARTEMIS_DESTINATION: lab.events
+
+      LAB_FAIL_MODE: NONE
+      LAB_FAIL_RATE: "0.0"
+      LAB_FAIL_SLEEP_MS: "0"
+      LAB_FAIL_ON_MESSAGE_IDS: ""
+    ports:
+      - "8085:8081"
+
+  # -------- Consumers (IDEMPOTENT) --------
+  consumer-idempotent-1:
+    profiles: ["idempotent"]
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.module
+      args:
+        MODULE_DIR: apps/consumer-idempotent
+    depends_on:
+      postgres:
+        condition: service_healthy
+      artemis:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: artemis
+      SPRING_ARTEMIS_BROKER_URL: tcp://artemis:61616
+      SPRING_ARTEMIS_USER: artemis
+      SPRING_ARTEMIS_PASSWORD: artemis
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/lab
+      SPRING_DATASOURCE_USERNAME: lab
+      SPRING_DATASOURCE_PASSWORD: lab
+      LAB_ARTEMIS_DESTINATION: lab.events
+
+      LAB_FAIL_MODE: NONE
+      LAB_FAIL_RATE: "0.0"
+      LAB_FAIL_SLEEP_MS: "0"
+      LAB_FAIL_ON_MESSAGE_IDS: ""
+    ports:
+      - "8082:8082"
+
+  consumer-idempotent-2:
+    profiles: ["idempotent"]
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.module
+      args:
+        MODULE_DIR: apps/consumer-idempotent
+    depends_on:
+      postgres:
+        condition: service_healthy
+      artemis:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: artemis
+      SPRING_ARTEMIS_BROKER_URL: tcp://artemis:61616
+      SPRING_ARTEMIS_USER: artemis
+      SPRING_ARTEMIS_PASSWORD: artemis
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/lab
+      SPRING_DATASOURCE_USERNAME: lab
+      SPRING_DATASOURCE_PASSWORD: lab
+      LAB_ARTEMIS_DESTINATION: lab.events
+
+      LAB_FAIL_MODE: NONE
+      LAB_FAIL_RATE: "0.0"
+      LAB_FAIL_SLEEP_MS: "0"
+      LAB_FAIL_ON_MESSAGE_IDS: ""
+    ports:
+      - "8084:8082"
+
+  consumer-idempotent-3:
+    profiles: ["idempotent"]
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.module
+      args:
+        MODULE_DIR: apps/consumer-idempotent
+    depends_on:
+      postgres:
+        condition: service_healthy
+      artemis:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: artemis
+      SPRING_ARTEMIS_BROKER_URL: tcp://artemis:61616
+      SPRING_ARTEMIS_USER: artemis
+      SPRING_ARTEMIS_PASSWORD: artemis
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/lab
+      SPRING_DATASOURCE_USERNAME: lab
+      SPRING_DATASOURCE_PASSWORD: lab
+      LAB_ARTEMIS_DESTINATION: lab.events
+
+      LAB_FAIL_MODE: NONE
+      LAB_FAIL_RATE: "0.0"
+      LAB_FAIL_SLEEP_MS: "0"
+      LAB_FAIL_ON_MESSAGE_IDS: ""
+    ports:
+      - "8086:8082"

@@ -1,0 +1,7 @@
+**/target/
+**/build/
+**/.idea/
+**/.vscode/
+.git
+.gitignore
+.DS_Store

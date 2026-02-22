@@ -1,0 +1,25 @@
+# syntax=docker/dockerfile:1
+FROM maven:3.9.9-eclipse-temurin-21 AS build
+WORKDIR /workspace
+
+# Copy everything (simple and reliable for lab)
+COPY . .
+
+# Which module to build?
+ARG MODULE_DIR
+
+# Build only the module + its deps
+RUN mvn -q -pl ${MODULE_DIR} -am package -DskipTests
+
+# Runtime
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+
+ARG MODULE_DIR
+# Copy the fat jar from module target/
+# Works for Spring Boot modules; for common it would copy the plain jar (not used as a container)
+RUN test -n "${MODULE_DIR}"
+COPY --from=build /workspace/${MODULE_DIR}/target/*.jar /app/app.jar
+
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/app/app.jar"]

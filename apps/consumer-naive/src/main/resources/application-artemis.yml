@@ -1,0 +1,14 @@
+lab:
+  artemis:
+    destination: lab.events
+
+spring:
+  artemis:
+    broker-url: tcp://localhost:61616
+    user: artemis
+    password: artemis
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/lab
+    username: lab
+    password: lab

@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: consumer-naive
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  server:
+    port: 8081

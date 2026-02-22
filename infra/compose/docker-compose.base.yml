@@ -1,0 +1,23 @@
+name: idempotency-lab
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: lab-postgres
+    environment:
+      POSTGRES_DB: lab
+      POSTGRES_USER: lab
+      POSTGRES_PASSWORD: lab
+    ports:
+      - "5432:5432"
+    volumes:
+      - lab_pgdata:/var/lib/postgresql/data
+      - ../postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lab -d lab"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  lab_pgdata:

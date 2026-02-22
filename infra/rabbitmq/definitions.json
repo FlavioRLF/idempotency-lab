@@ -1,0 +1,40 @@
+{
+  "vhosts": [{"name": "/"}],
+  "users": [{
+    "name": "guest",
+    "password_hash": "j9t8wR4Y5D9zJw6zvY+5n0Qk3kQ=",
+    "hashing_algorithm": "rabbit_password_hashing_sha256",
+    "tags": "administrator"
+  }],
+  "permissions": [{
+    "user": "guest",
+    "vhost": "/",
+    "configure": ".*",
+    "write": ".*",
+    "read": ".*"
+  }],
+  "exchanges": [{
+    "name": "lab.exchange",
+    "vhost": "/",
+    "type": "direct",
+    "durable": true,
+    "auto_delete": false,
+    "internal": false,
+    "arguments": {}
+  }],
+  "queues": [{
+    "name": "lab.events.queue",
+    "vhost": "/",
+    "durable": true,
+    "auto_delete": false,
+    "arguments": {}
+  }],
+  "bindings": [{
+    "source": "lab.exchange",
+    "vhost": "/",
+    "destination": "lab.events.queue",
+    "destination_type": "queue",
+    "routing_key": "lab.events",
+    "arguments": {}
+  }]
+}

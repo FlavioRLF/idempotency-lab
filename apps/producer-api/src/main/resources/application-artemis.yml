@@ -1,0 +1,12 @@
+server:
+  port: 8080
+
+lab:
+  artemis:
+    destination: lab.events
+
+spring:
+  artemis:
+    broker-url: tcp://localhost:61616
+    user: artemis
+    password: artemis
